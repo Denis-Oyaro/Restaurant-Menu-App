@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Menu</title>
+    </head>
+    <body>
+        <h1>{{restaurant.name}}</h1>
+        {% if not items %}
+        <p> You currently have no menu items.</p>
+        {% endif %}
+        <p><a href="#">Add new item</a><p>
+        
+        {% if items %}
+        {% set ns = namespace(found = False) %}
+        {% for item in items %}
+        {% if item.course == "Appetizer" and not ns.found %}
+        <h2>Appetizers</h2>
+        {% set ns.found = True %}
+        {% endif %}
+        {% endfor %}
+        
+        {% for item in items %}
+        {% if item.course == "Appetizer" %}
+            <p>
+                {{item.name}}
+                </br>
+                {{item.description}}
+                </br>
+                {{item.price}}
+                </br>
+                <a href="#">Edit</a>
+                </br>
+                <a href="#">Delete</a>
+            </p>
+        {% endif %}
+        {% endfor %}   
+
+        {% set ns = namespace(found = False) %}
+        {% for item in items %}
+        {% if item.course == "Entree" and not ns.found %}
+        <h2>Entrees</h2>
+        {% set ns.found = True %}
+        {% endif %}
+        {% endfor %}
+        
+        {% for item in items %}
+        {% if item.course == "Entree" %}
+            <p>
+                {{item.name}}
+                </br>
+                {{item.description}}
+                </br>
+                {{item.price}}
+                </br>
+                <a href="#">Edit</a>
+                </br>
+                <a href="#">Delete</a>
+            </p>
+        {% endif %}
+        {% endfor %} 
+        
+        {% set ns = namespace(found = False) %}
+        {% for item in items %}
+        {% if item.course == "Dessert" and not ns.found %}
+        <h2>Desserts</h2>
+        {% set ns.found = True %}
+        {% endif %}
+        {% endfor %}
+        
+        {% for item in items %}
+        {% if item.course == "Dessert" %}
+            <p>
+                {{item.name}}
+                </br>
+                {{item.description}}
+                </br>
+                {{item.price}}
+                </br>
+                <a href="#">Edit</a>
+                </br>
+                <a href="#">Delete</a>
+            </p>
+        {% endif %}
+        {% endfor %} 
+        
+        {% set ns = namespace(found = False) %}
+        {% for item in items %}
+        {% if item.course == "Beverage" and not ns.found %}
+        <h2>Beverages</h2>
+        {% set ns.found = True %}
+        {% endif %}
+        {% endfor %}
+        
+        {% for item in items %}
+        {% if item.course == "Beverage" %}
+            <p>
+                {{item.name}}
+                </br>
+                {{item.description}}
+                </br>
+                {{item.price}}
+                </br>
+                <a href="#">Edit</a>
+                </br>
+                <a href="#">Delete</a>
+            </p>
+        {% endif %}
+        {% endfor %} 
+        {% endif %}
+    </body>
+</html>
