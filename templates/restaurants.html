@@ -9,15 +9,15 @@
         {% if not restaurants %}
         <p> You currently have no restaurants.</p>
         {% endif %}
-        <a href="#">Add a new restaurant</a>
+        <a href="{{url_for('newRestaurant')}}">Add a new restaurant</a>
         {% if restaurants %}
         {% for restaurant in restaurants %}
             <p>
                 {{restaurant.name}}
                 </br>
-                <a href="#">Edit Restaurant</a>
+                <a href="{{url_for('editRestaurant', restaurant_id = restaurant.id)}}">Edit Restaurant</a>
                 </br>
-                <a href="#">Delete Restaurant</a>
+                <a href="{{url_for('deleteRestaurant', restaurant_id = restaurant.id)}}">Delete Restaurant</a>
             </p>
         {% endfor %}
         {% endif %}

@@ -6,11 +6,11 @@
     </head>
     <body>
         <h1>Edit Restaurant</h1>
-        <form method='post' action="#">
+        <form method='post' action="{{url_for('editRestaurant',restaurant_id = restaurant.id)}}">
             <p>Name:</p>
             <input type='text' name='editRestaurant' placeholder='{{restaurant.name}}'>
             <input type='submit' value='Edit'>
-            <a href="#">Cancel</a>
+            <a href="{{url_for('showRestaurants')}}">Cancel</a>
         </form>
     </body>
 </html>
