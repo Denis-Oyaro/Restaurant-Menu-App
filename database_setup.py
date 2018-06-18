@@ -9,6 +9,13 @@ class Restaurant(Base):
     __tablename__ = "restaurant"
     name = Column(String(80), nullable = False)
     id = Column(Integer, primary_key = True)   
+    
+    @property
+    def serialize(self):
+        return {
+            "id" : self.id,
+            "name" : self.name,
+        }
 
 class MenuItem(Base):
     __tablename__ = "menu_item"
@@ -19,6 +26,16 @@ class MenuItem(Base):
     price = Column(String(8))
     restaurant_id = Column(Integer, ForeignKey('restaurant.id'))
     restaurant = relationship(Restaurant)
+    
+    @property
+    def serialize(self):
+        return {
+            "course" : self.course,
+            "description" : self.description,
+            "id" : self.id,
+            "name" : self.name,
+            "price" : self.price
+        }
     
 if __name__ == "__main__":
     engine = create_engine('postgres:///happyrestaurant')
