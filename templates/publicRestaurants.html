@@ -30,11 +30,10 @@
                 {% endif %}
             {% endwith %}
         </div>
-        <p><a href="{{url_for('disconnect')}}">Click Here to Log out </a></p>
+        <p><a href="{{url_for('showLogin')}}">Click Here to Log in</a></p>
         {% if not restaurants %}
-        <p> You currently have no restaurants.</p>
+        <p> There are currently no restaurants.</p>
         {% endif %}
-        <a href="{{url_for('newRestaurant')}}">Add a new restaurant</a>
         {% if restaurants %}
         {% for restaurant in restaurants %}
             <p>
