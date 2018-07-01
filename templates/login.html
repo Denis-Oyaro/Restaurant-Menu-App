@@ -28,7 +28,7 @@
                 if(authResult.code){
                     // Hide the signin button now that the user is authenticated/authorized
                     $('#signinButtonG').attr('style', 'display:none');
-                    //$('#signinButtonFB').attr('style', 'display:none');
+                    $('#signinButtonFB').attr('style', 'display:none');
                     
                     /* Send the onetime-use-code to the server, if the server responds,
                      write a 'login successful' message to the web page and redirect back 
@@ -43,13 +43,67 @@
                                 $('#result').html(result + '</br>Redirecting...');
                                 setTimeout(function(){
                                     window.location.href = '/restaurants';
-                                }, 3000);
+                                }, 2000);
                         }
                     });
                 } 
             }  
         </script>        
         <!-- End Google plus sign in -->
-       
+        
+        <!-- Facebook sign in -->         
+        <script>
+            
+            // Code to first load the JavaScript SDK
+            window.fbAsyncInit = function() {
+                FB.init({
+                        appId: "1993255724082494",
+                        cookie: true, // enable cookies to allow the server to access the session
+                        xfbml: true, // parse social plugins on this page
+                        version: 'v2.8' // use version 2.8  
+                });
+            };
+            
+            // calls the SDK asynchronously
+            (function(d,s,id){
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if(d.getElementById(id)) return;
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_us/sdk.js";
+                fjs.parentNode.insertBefore(js,fjs);
+            
+            }(document, 'script', 'facebook-jssdk'));
+            
+            // callback after facebook login
+            function sendTokenToServer() {
+                var access_token = FB.getAuthResponse()['accessToken'];
+                // Hide the signin button now that the user is authenticated/authorized
+                $('#signinButtonG').attr('style', 'display:none');
+                $('#signinButtonFB').attr('style', 'display:none');
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/fbconnect?state={{STATE}}',
+                    processData: false,
+                    data: access_token,
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    success: function(result){
+                                $('#result').html(result + '</br>Redirecting...');
+                                setTimeout(function(){
+                                    window.location.href = '/restaurants';
+                                }, 2000);
+                        }
+                    });
+                    
+                }
+        </script>
+        
+        <button id="signinButtonFB">
+            <!-- uses facebook SDK to create facebook login button -->
+            <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+                <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+            </fb:login-button>
+        </button>
+        <!-- End Facebook sign in -->    
     </body>
 </html>

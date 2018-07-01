@@ -20,6 +20,58 @@ session = DBSession()
 app = Flask(__name__)
 
 
+@app.route('/fbconnect', methods = ['POST'])
+def fbconnect():
+    # protect against cross-site request forgery attacks
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter'))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = request.data  # retrieve short-term access token
+    # exchange client token for long-lived server token
+    app_id = json.loads(open('fb_client_secrets.json','r').read())['web']['app_id']
+    app_secret = json.loads(open('fb_client_secrets.json','r').read())['web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id={}&client_secret={}&fb_exchange_token={}'.format(app_id, app_secret, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    # Extract access token
+    token = json.loads(result)['access_token']
+    url = "https://graph.facebook.com/v2.8/me?fields=name,id,email&access_token=%s" % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+    #populate login_session
+    login_session['provider'] = 'facebook'
+    login_session['username'] = data['name']
+    login_session['email'] = data['email']
+    login_session['facebook_id'] = data['id']
+    # The token must be stored in the login_session in order to properly logout
+    login_session['access_token'] = token
+    
+    # Get user picture
+    url = 'https://graph.facebook.com/v2.8/me/picture?access_token=%s&redirect=0&height=200&width=200' % token 
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+    login_session['picture'] = data['data']['url']
+    
+    # see if user exists. If doesn't, make a new one.
+    user_id = getUserID(login_session['email'])
+    if user_id is None:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    flash("you are now logged in as %s" % login_session['username'])
+    print "done!"
+    return output
+    
+    
 @app.route('/gconnect', methods = ['POST'])
 def gconnect():
     if request.args.get('state') != login_session['state']:
@@ -105,6 +157,13 @@ def gdisconnect():
     url = 'https://accounts.google.com/o/oauth2/revoke?token={}'.format(access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
+
+def fbdisconnect():
+    facebook_id = login_session['facebook_id']
+    access_token = login_session['access_token']
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
     
 # Disconnect - revoke a current user's token and reset their login session
 @app.route('/disconnect')
@@ -115,7 +174,7 @@ def disconnect():
             del login_session['credentials']
             del login_session['gplus_id']
         if login_session['provider'] == 'facebook':
-            #fbdisconnect()
+            fbdisconnect()
             del login_session['facebook_id']
             del login_session['access_token']
             
